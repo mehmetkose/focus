@@ -1,52 +1,71 @@
-var gulp = require('gulp'),
-	connect = require('gulp-connect'),
-	browserify = require('gulp-browserify'),
-	uglify  = require('gulp-uglify'),
-	source = require('vinyl-source-stream'),
-	concat = require('gulp-concat'),
+const gulp = require('gulp');
+const clean = require('gulp-clean');
+const livereload = require('gulp-server-livereload');
+const watchify = require('watchify');
+const errorify = require('errorify');
+const gutil = require('gulp-util');
+const source = require('vinyl-source-stream');
+const browserify = require('browserify');
 
-	port = process.env.port || 5000 ;
+const instanceBrowserify = browserify({
+                              entries: ['./src/app.jsx'],
+                              extensions: ['.js', '.jsx'],
+                              cache: {},
+                              packageCache: {},
+                              plugin: 'errorify'
+                           })
+                           .transform("babelify",{ presets: ['react', 'es2015'] })
+                           .transform({ global: true },"uglifyify")
+                           .on('error', function(err) { console.error(err); this.emit('end'); });
 
-	gulp.task('browserify',function(){
-		gulp.src('./app/js/main.js')
-		.pipe(browserify({
-			transform:'reactify',
-			debug: true,
-		}))
-		.pipe(gulp.dest('./dist/js'))
-	});
+const filesWatch = [
+    'src/*.*',
+    '!src/*.jsx',
+    'src/css/*',
+    'src/libs/**/*'
+];
 
-	gulp.task('connect',function(){
-		connect.server({
-			root:'./',
-			port:port,
-			livereload:true,
-		})
-	});
+bundler = () =>
+    instanceBrowserify
+        .bundle()
+        .pipe(source('app.js'))
+        .pipe(gulp.dest('dist'))
 
-	gulp.task('js',function(){
-		gulp.src('./dist/**/*.js')
-		.pipe(connect.reload())
-	});
+watcher = () => {
+    instanceBrowserify
+        .plugin('watchify')
+        .on('update', bundler)
+        .on('log', gutil.log.bind(this, 'Watchify update...'))
+    bundler()
+    gulp.watch(filesWatch, move)
+}
 
-	gulp.task('build',function(){
-		gulp.src('./dist/js/main.js')
-		.pipe(concat('main.min.js'))
-		//.pipe(uglify())
-		.pipe(gulp.dest('./dist/js/'));
-	});
+cleaner = () =>
+    gulp.src('dist', { read: false })
+        .pipe(clean())
 
-	gulp.task('html',function(){
-		gulp.src('./app/**/*.html')
-		.pipe(connect.reload())
-	});
+server = () =>
+    gulp.src(['dist'])
+        .pipe(livereload({
+            livereload: true,
+            defaultFile: 'index.html',
+            fallback: 'index.html',
+            log: 'debug'
+        }))
 
-	gulp.task('watch',function(){
-		gulp.watch('./dist/**/*.js',['js', 'build']);
-		gulp.watch('./app/**/*.html',['html']);
-		gulp.watch('./app/**/*.js',['browserify']);
-	});
+move = (event) =>
+    gulp.src(event.path, { base: 'src' })
+        .pipe(gulp.dest('dist'))
 
-	gulp.task('default',['browserify']);
+moveAll = () =>
+    gulp.src(filesWatch, { base: 'src'} )
+        .pipe(gulp.dest('dist'))
 
-	gulp.task('server',['browserify','connect','watch']);
+gulp
+    .task('bundle', bundler)
+    .task('move-static', moveAll)
+    .task('watch', watcher)
+    .task('clean', cleaner)
+    .task('server', server)
+    .task('build', ['bundle', 'move-static'])
+    .task('default', ['watch', 'server']);
