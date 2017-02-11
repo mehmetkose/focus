@@ -1,14 +1,29 @@
 /** @jsx h */
-import Preact from 'preact';
+import preact from 'preact';
 
-const { h, render, Component, hooks, options } = Preact;
+const { h, Component, render, options } = preact;
+
+import injectTapEventPlugin from 'preact-tap-event-plugin';
+injectTapEventPlugin();
 
 class App extends Component {
-	render() {
+	state = {
+		count: 0
+	};
+
+	onTap = e => {
+		console.log('tap: ', e);
+		this.setState({ count: this.state.count+1 });
+	};
+
+	render({ }, { count }) {
 		return (
-			<h1>Hello World !</h1>
+			<div class="app">
+				<button onTouchTap={this.onTap}>Tap Me!</button>
+				<span>{count}</span>
+			</div>
 		);
 	}
 }
 
-render(<App/>, document.getElementById('app'));
+render(<App />, document.body);

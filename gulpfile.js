@@ -6,6 +6,7 @@ const errorify = require('errorify');
 const gutil = require('gulp-util');
 const source = require('vinyl-source-stream');
 const browserify = require('browserify');
+var fs = require('fs');
 
 const instanceBrowserify = browserify({
                               entries: ['./src/app.jsx'],
@@ -14,7 +15,7 @@ const instanceBrowserify = browserify({
                               packageCache: {},
                               plugin: 'errorify'
                            })
-                           .transform("babelify",{ presets: ['react', 'es2015'] })
+                           .transform("babelify",{ presets: ['react', 'es2015', 'stage-0'] })
                            .transform({ global: true },"uglifyify")
                            .on('error', function(err) { console.error(err); this.emit('end'); });
 

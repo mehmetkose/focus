@@ -1,0 +1,15 @@
+
+
+#app{
+  text-align:center;
+}
+
+button{
+  padding: 1em;
+}
+
+span{
+  font-size: 2em;
+  margin-top: 2em;
+  margin-left: 3em;
+}
