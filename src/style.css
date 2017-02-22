@@ -13,3 +13,37 @@ span{
   margin-top: 2em;
   margin-left: 3em;
 }
+
+
+html,
+body {
+  font: 16px/1.21 arial, sans-serif;
+  overflow: hidden;
+}
+.foo {
+  box-sizing: border-box;
+  position: absolute;
+  background: #CCC;
+  width: 90px;
+  height: 90px;
+  padding: 20px 0;
+  border: 1px solid #AAA;
+  border-radius: 3px;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  user-drag: none;
+  text-align: center;
+  will-change: transform;
+  -webkit-transition: box-shadow 150ms ease, background-color 150ms ease;
+  transition: box-shadow 150ms ease, background-color 150ms ease;
+  z-index: 1;
+  overflow: hidden;
+}
+.foo[updated] {
+  -webkit-transition: none;
+  transition: none;
+  box-shadow: 0 0 25px rebeccapurple;
+  background-color: #e6d9f2;
+}
