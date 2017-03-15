@@ -27,7 +27,6 @@ const instanceBrowserify = browserify({
 const filesWatch = [
     'src/*.*',
     '!src/*.jsx',
-    'src/css/*',
     'src/libs/**/*'
 ];
 
@@ -36,6 +35,7 @@ bundler = () =>
         .bundle()
         .pipe(source('app.js'))
         .pipe(gulp.dest('dist'))
+
 
 watcher = () => {
     instanceBrowserify
@@ -59,7 +59,6 @@ server = () =>
             log: 'debug'
         }))
 
-
 move = (event) =>
     gulp.src(event.path, { base: 'src' })
         .pipe(gulp.dest('dist'))
@@ -68,6 +67,7 @@ moveAll = () =>
     gulp.src(filesWatch, { base: 'src'} )
         .pipe(gulp.dest('dist'))
 
+// Scaffold Mobile & Desktop
 scaffold = () => {
     let appSlug = settings.app.appSlug || "hello";
     let appName = settings.app.appName || "HelloWorld";
@@ -94,6 +94,7 @@ scaffold = () => {
     });
 
   }
+
 
 gulp
     .task('bundle', bundler)
