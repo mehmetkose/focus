@@ -14,14 +14,14 @@ const exec = require('child_process').exec;
 var settings = require('./package.json');
 
 const instanceBrowserify = browserify({
-                              entries: ['./src/app.jsx'],
+                              entries: ['./src/app.jsx', './src/components/clickable.jsx'],
                               extensions: ['.js', '.jsx'],
                               cache: {},
                               packageCache: {},
                               plugin: 'errorify'
                            })
                            .transform("babelify",{ presets: ['react', 'es2015', 'stage-0'] })
-                           .transform({ global: true },"uglifyify")
+                           //.transform({ global: true },"uglifyify")
                            .on('error', function(err) { console.error(err); this.emit('end'); });
 
 const filesWatch = [
@@ -94,7 +94,6 @@ scaffold = () => {
     });
 
   }
-
 
 gulp
     .task('bundle', bundler)
